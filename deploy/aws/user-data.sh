@@ -18,10 +18,10 @@ chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
 git clone https://github.com/GabrielMagdaleno12/gestao-eventos-auditorios /opt/eventos
 cd /opt/eventos/deploy/aws
 
-# descobre o dominio da CloudFront (distribuicao com comentario "eventos")
-TOKEN=$(curl -s -X PUT http://169.254.169.254/latest/api/token -H 'X-aws-ec2-metadata-token-ttl-seconds: 60')
+# descobre o endereco do API Gateway HTTP (API com nome "eventos")
+export AWS_DEFAULT_REGION=us-east-1
 for i in $(seq 1 120); do
-  PUBLIC_HOST=$(aws cloudfront list-distributions --query "DistributionList.Items[?Comment=='eventos'].DomainName | [0]" --output text 2>/dev/null)
+  PUBLIC_HOST=$(aws apigatewayv2 get-apis --query "Items[?Name=='eventos'].ApiEndpoint | [0]" --output text 2>/dev/null | sed 's#https://##')
   [ -n "$PUBLIC_HOST" ] && [ "$PUBLIC_HOST" != "None" ] && break
   sleep 15
 done

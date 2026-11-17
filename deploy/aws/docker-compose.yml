@@ -24,6 +24,8 @@ services:
       dockerfile: deploy/aws/Dockerfile.web
       args:
         VITE_KEYCLOAK_URL: https://${PUBLIC_HOST}/auth
+    environment:
+      PUBLIC_HOST: ${PUBLIC_HOST}
     ports: ["80:80"]
     depends_on: [api, keycloak]
     restart: unless-stopped
