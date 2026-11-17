@@ -1,0 +1,40 @@
+# Blueprint do Render: sobe Keycloak e API (Spring Boot) como servicos Docker gratuitos.
+# O front-end (React) vai na Vercel. Valores marcados com sync:false sao pedidos na criacao.
+services:
+  - type: web
+    name: eventos-keycloak
+    runtime: docker
+    plan: free
+    dockerfilePath: ./keycloak/Dockerfile
+    dockerContext: ./keycloak
+    envVars:
+      - key: PORT
+        value: "8080"
+      - key: KC_HTTP_PORT
+        value: "8080"
+      - key: KC_BOOTSTRAP_ADMIN_USERNAME
+        value: admin
+      - key: KC_BOOTSTRAP_ADMIN_PASSWORD
+        sync: false
+      - key: FRONTEND_URL        # ex.: https://eventos-web.vercel.app (sem barra no fim)
+        sync: false
+
+  - type: web
+    name: eventos-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    envVars:
+      - key: PORT
+        value: "8080"
+      - key: DB_URL              # JDBC do pooler "Session mode" do Supabase
+        sync: false
+      - key: DB_USER             # postgres.<ref-do-projeto>
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: KEYCLOAK_ISSUER     # https://<keycloak>.onrender.com/realms/eventos
+        sync: false
+      - key: CORS_ORIGINS        # URL do front-end na Vercel
+        sync: false
